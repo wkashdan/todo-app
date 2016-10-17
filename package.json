@@ -1,0 +1,22 @@
+{
+  "name": "todo-app",
+  "version": "1.0.0",
+  "description": "A basic JavaScript To-Do List Application to demonstrate JavaScript, CSS and HTML concepts",
+  "main": "index.js",
+  "scripts": {
+    "watch-styles": "sass --watch styles/styles.scss:styles/styles.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wkashdan/todo-app.git"
+  },
+  "author": "Will Kashdan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wkashdan/todo-app/issues"
+  },
+  "homepage": "https://github.com/wkashdan/todo-app#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

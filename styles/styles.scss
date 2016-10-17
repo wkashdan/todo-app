@@ -1,0 +1,162 @@
+$brand-primary: darken(#3F51B5, 6.5%);
+$brand-success: #5cb85c;
+$brand-info:    #5bc0de;
+$brand-warning: #f0ad4e;
+$brand-danger:  #d9534f;
+
+$gray-darker:  lighten(#000, 13.5%); 
+$gray-dark:    lighten(#000, 20%);   
+$gray:         lighten(#000, 33.5%); 
+$gray-light:   lighten(#000, 70.7%); 
+$gray-lighter: lighten(#000, 93.5%); 
+$white: #FFFFFF;
+
+$HEADER_HEIGHT: 50px;
+
+h1,h2,h3,h4,h5,h6 {
+	margin: 0px;
+}
+
+body, html {
+	height: 100%;
+	padding:0px;
+	margin:0px;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+main {
+	height: calc(100% - #{$HEADER_HEIGHT});
+}
+
+/* HEADER STYLES */
+
+
+.header-title {
+	color: $white;
+	font-size: 20px;
+	margin: 0px;
+	line-height: $HEADER_HEIGHT;
+	text-align: center;
+	font-weight: 100;
+}
+
+.header {
+	background-color: $brand-primary;
+	height: $HEADER_HEIGHT;
+	margin: 0px;
+}
+
+/* LIST NAV */
+
+$MYLIST_ITEM_PADDING: 5px;
+$MYLIST_ITEM_MARGIN: 10px;
+$MYLIST_HEADER_HEIGHT: 30px;
+$MYLIST_WIDTH: 220px;
+
+.mylist-nav {
+	background-color: $gray-lighter;
+	width: $MYLIST_WIDTH;
+	height: 100%;
+	float: left;
+}
+
+.mylist-header {
+	color: $gray-light;
+	font-size: 16px;
+	text-align: center;
+	height: $HEADER_HEIGHT;
+	line-height: $HEADER_HEIGHT;
+}
+
+.mylist-list {
+	margin: 0px;
+	padding: 0px;
+}
+
+.mylist-item {
+	color: $white;
+	background-color: $gray-light;
+	list-style: none;
+	text-align: center;
+	padding-top: $MYLIST_ITEM_PADDING;
+	padding-bottom: $MYLIST_ITEM_PADDING;
+	margin-bottom: $MYLIST_ITEM_MARGIN;
+	margin-left: $MYLIST_ITEM_MARGIN;
+	margin-right: $MYLIST_ITEM_MARGIN;
+	border-width: 2px;
+	border-style: solid;
+	border-color: transparent;
+	transition: border-color 200ms ease-in;
+	cursor: pointer;
+}
+
+.mylist-item:hover {
+	border-color: $gray;
+	transition: border-color 200ms ease-in;
+}
+
+/* content-section */
+.content {
+	width: calc(100% - #{$MYLIST_WIDTH});
+	float:right;
+	height: 100%;
+}
+
+/* active-list stles */
+
+$ACTIVE_LIST_MARGIN: 15px;
+$ACTIVE_LIST_PADDING: 10px;
+
+.active-list {
+	margin-top: $ACTIVE_LIST_MARGIN;
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 400px;
+	padding: 0px;
+	list-style: none;
+}
+
+.active-list-item {
+	border-color: transparent;
+	border-width: 2px;
+	border-style: solid;
+	background-color: $gray-lighter;
+	padding: $ACTIVE_LIST_PADDING;
+	margin-bottom: $ACTIVE_LIST_MARGIN;
+	color: $gray-light;
+	transition: border-color 200ms ease-in;
+}
+
+.active-list-item:hover {
+	border-color: $gray-light;
+	border-width: 2px;
+	border-style: solid;
+	transition: border-color 200ms ease-in;
+	cursor: pointer;
+}
+
+.todo-input {
+	margin: 0px;
+	padding: $ACTIVE_LIST_PADDING;
+	box-sizing: border-box;
+	width: 100%;
+	border-width: 2px;
+	border-style: solid;
+	border-color: $gray-lighter;
+	margin-bottom: $ACTIVE_LIST_MARGIN;
+	transition: border-color 200ms ease-in;
+}
+
+.todo-input:hover {
+	border-color: $brand-primary;
+	border-width: 2px;
+	transition: border-color 200ms ease-in;
+}
+
+.todo-input:focus {
+	border-width: 2px;
+	border-color: $brand-primary;
+	border-style: solid;
+	transition: border-width 200ms ease-in;
+	outline-width: 0px;
+}

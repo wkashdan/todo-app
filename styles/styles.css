@@ -1,0 +1,120 @@
+h1, h2, h3, h4, h5, h6 {
+  margin: 0px; }
+
+body, html {
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  font-family: Arial, Helvetica, sans-serif; }
+
+main {
+  height: calc(100% - 50px); }
+
+/* HEADER STYLES */
+.header-title {
+  color: #FFFFFF;
+  font-size: 20px;
+  margin: 0px;
+  line-height: 50px;
+  text-align: center;
+  font-weight: 100; }
+
+.header {
+  background-color: #36469c;
+  height: 50px;
+  margin: 0px; }
+
+/* LIST NAV */
+.mylist-nav {
+  background-color: #eeeeee;
+  width: 220px;
+  height: 100%;
+  float: left; }
+
+.mylist-header {
+  color: #b4b4b4;
+  font-size: 16px;
+  text-align: center;
+  height: 50px;
+  line-height: 50px; }
+
+.mylist-list {
+  margin: 0px;
+  padding: 0px; }
+
+.mylist-item {
+  color: #FFFFFF;
+  background-color: #b4b4b4;
+  list-style: none;
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: transparent;
+  transition: border-color 200ms ease-in;
+  cursor: pointer; }
+
+.mylist-item:hover {
+  border-color: #555555;
+  transition: border-color 200ms ease-in; }
+
+/* content-section */
+.content {
+  width: calc(100% - 220px);
+  float: right;
+  height: 100%; }
+
+/* active-list stles */
+.active-list {
+  margin-top: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 400px;
+  padding: 0px;
+  list-style: none; }
+
+.active-list-item {
+  border-color: transparent;
+  border-width: 2px;
+  border-style: solid;
+  background-color: #eeeeee;
+  padding: 10px;
+  margin-bottom: 15px;
+  color: #b4b4b4;
+  transition: border-color 200ms ease-in; }
+
+.active-list-item:hover {
+  border-color: #b4b4b4;
+  border-width: 2px;
+  border-style: solid;
+  transition: border-color 200ms ease-in;
+  cursor: pointer; }
+
+.todo-input {
+  margin: 0px;
+  padding: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #eeeeee;
+  margin-bottom: 15px;
+  transition: border-color 200ms ease-in; }
+
+.todo-input:hover {
+  border-color: #36469c;
+  border-width: 2px;
+  transition: border-color 200ms ease-in; }
+
+.todo-input:focus {
+  border-width: 2px;
+  border-color: #36469c;
+  border-style: solid;
+  transition: border-width 200ms ease-in;
+  outline-width: 0px; }
+
+/*# sourceMappingURL=styles.css.map */
