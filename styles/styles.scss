@@ -68,7 +68,7 @@ $MYLIST_WIDTH: 220px;
 	line-height: $HEADER_HEIGHT;
 }
 
-.mylist-list {
+.mylists {
 	margin: 0px;
 	padding: 0px;
 }
@@ -86,12 +86,31 @@ $MYLIST_WIDTH: 220px;
 	border-width: 2px;
 	border-style: solid;
 	border-color: transparent;
-	transition: border-color 200ms ease-in;
+	transition: border-color 200ms ease-in, opacity 200ms ease-in;
 	cursor: pointer;
 }
 
 .mylist-item:hover {
 	border-color: $gray;
+	transition: border-color 200ms ease-in;
+}
+
+.mylist-input {
+	margin-left: $MYLIST_ITEM_MARGIN;
+	margin-right: $MYLIST_ITEM_MARGIN;
+	margin-bottom: $MYLIST_ITEM_MARGIN;
+	padding: $MYLIST_ITEM_PADDING;
+	border-width: 2px;
+	border-style: solid;
+	border-color: $gray-light;
+	outline: 0px;
+	box-sizing: border-box;
+	width: calc(100% - #{$MYLIST_ITEM_MARGIN}*2);
+	transition: border-color 200ms ease-in;
+}
+
+.mylist-input:hover, .mylist-input:focus {
+	border-color: $brand-primary;
 	transition: border-color 200ms ease-in;
 }
 
@@ -145,18 +164,20 @@ $ACTIVE_LIST_PADDING: 10px;
 	border-color: $gray-lighter;
 	margin-bottom: $ACTIVE_LIST_MARGIN;
 	transition: border-color 200ms ease-in;
+	outline: 0px;
 }
 
-.todo-input:hover {
+.todo-input:hover, .todo-input:focus {
 	border-color: $brand-primary;
 	border-width: 2px;
 	transition: border-color 200ms ease-in;
 }
 
-.todo-input:focus {
-	border-width: 2px;
-	border-color: $brand-primary;
-	border-style: solid;
-	transition: border-width 200ms ease-in;
-	outline-width: 0px;
+@keyframes fadein {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+.fade-in {
+  opacity:1;
+  animation : fadein 400ms linear;
 }

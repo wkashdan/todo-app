@@ -22,19 +22,21 @@
   <main>
     <nav class="mylist-nav">
       <h2 class="mylist-header">My Lists</h2>
-      <ul class="mylist-list">
-        <li class="mylist-item">List 1</li>
-        <li class="mylist-item">List 2</li>
+      <ul id="myLists" class="mylists">
+        <form id="myListForm">
+          <input name="mylistInput" class="mylist-input" placeholder="New List..." type="text">
+        </form>
       </ul>
     </nav>
     <section class="content">
         
-      <ul class="active-list">
-        <input class="todo-input" placeholder="Add Todo..." type="text">
-        <li class="active-list-item">to do 1</li>
-        <li class="active-list-item"> to do 2</li>
+      <ul id="selectedList" class="active-list">
+        <form id="itemForm">
+          <input name="itemInput" class="todo-input" placeholder="Add Item..." type="text">
+        </form>
     </section>
   </main>
+  <script src="./scripts/util.js"></script>
   <script src="./scripts/app.js"></script>
 </body>
 </html>

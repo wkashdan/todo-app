@@ -38,7 +38,7 @@ main {
   height: 50px;
   line-height: 50px; }
 
-.mylist-list {
+.mylists {
   margin: 0px;
   padding: 0px; }
 
@@ -55,11 +55,28 @@ main {
   border-width: 2px;
   border-style: solid;
   border-color: transparent;
-  transition: border-color 200ms ease-in;
+  transition: border-color 200ms ease-in, opacity 200ms ease-in;
   cursor: pointer; }
 
 .mylist-item:hover {
   border-color: #555555;
+  transition: border-color 200ms ease-in; }
+
+.mylist-input {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #b4b4b4;
+  outline: 0px;
+  box-sizing: border-box;
+  width: calc(100% - 10px*2);
+  transition: border-color 200ms ease-in; }
+
+.mylist-input:hover, .mylist-input:focus {
+  border-color: #36469c;
   transition: border-color 200ms ease-in; }
 
 /* content-section */
@@ -103,18 +120,21 @@ main {
   border-style: solid;
   border-color: #eeeeee;
   margin-bottom: 15px;
-  transition: border-color 200ms ease-in; }
+  transition: border-color 200ms ease-in;
+  outline: 0px; }
 
-.todo-input:hover {
+.todo-input:hover, .todo-input:focus {
   border-color: #36469c;
   border-width: 2px;
   transition: border-color 200ms ease-in; }
 
-.todo-input:focus {
-  border-width: 2px;
-  border-color: #36469c;
-  border-style: solid;
-  transition: border-width 200ms ease-in;
-  outline-width: 0px; }
+@keyframes fadein {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+.fade-in {
+  opacity: 1;
+  animation: fadein 400ms linear; }
 
 /*# sourceMappingURL=styles.css.map */
