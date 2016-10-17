@@ -86,12 +86,14 @@ main {
   height: 100%; }
 
 /* active-list stles */
-.active-list {
+.main-content {
   margin-top: 15px;
   margin-left: auto;
   margin-right: auto;
   max-width: 400px;
-  padding: 0px;
+  padding: 0px; }
+
+.active-list {
   list-style: none; }
 
 .active-list-item {
@@ -111,6 +113,10 @@ main {
   transition: border-color 200ms ease-in;
   cursor: pointer; }
 
+.active-list-item-selected {
+  border-color: #36469c !important;
+  transition: border-color 200ms ease-in; }
+
 .todo-input {
   margin: 0px;
   padding: 10px;
@@ -119,7 +125,6 @@ main {
   border-width: 2px;
   border-style: solid;
   border-color: #eeeeee;
-  margin-bottom: 15px;
   transition: border-color 200ms ease-in;
   outline: 0px; }
 

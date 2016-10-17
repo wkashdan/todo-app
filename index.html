@@ -22,18 +22,18 @@
   <main>
     <nav class="mylist-nav">
       <h2 class="mylist-header">My Lists</h2>
+      <form id="myListForm">
+        <input name="mylistInput" class="mylist-input" placeholder="New List..." type="text" autocomplete="off">
+      </form>
       <ul id="myLists" class="mylists">
-        <form id="myListForm">
-          <input name="mylistInput" class="mylist-input" placeholder="New List..." type="text">
-        </form>
       </ul>
     </nav>
     <section class="content">
-        
-      <ul id="selectedList" class="active-list">
-        <form id="itemForm">
-          <input name="itemInput" class="todo-input" placeholder="Add Item..." type="text">
-        </form>
+      <form class="main-content" id="itemForm">
+        <input name="itemInput" class="todo-input" placeholder="Add Item..." type="text" autocomplete="off">
+      </form>
+      <ul id="selectedList" class="main-content active-list">
+      </ul>
     </section>
   </main>
   <script src="./scripts/util.js"></script>

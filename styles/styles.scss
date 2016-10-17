@@ -126,12 +126,15 @@ $MYLIST_WIDTH: 220px;
 $ACTIVE_LIST_MARGIN: 15px;
 $ACTIVE_LIST_PADDING: 10px;
 
-.active-list {
+.main-content {
 	margin-top: $ACTIVE_LIST_MARGIN;
 	margin-left: auto;
 	margin-right: auto;
 	max-width: 400px;
 	padding: 0px;
+}
+
+.active-list {
 	list-style: none;
 }
 
@@ -154,6 +157,11 @@ $ACTIVE_LIST_PADDING: 10px;
 	cursor: pointer;
 }
 
+.active-list-item-selected {
+	border-color: $brand-primary !important;
+	transition: border-color 200ms ease-in;
+}
+
 .todo-input {
 	margin: 0px;
 	padding: $ACTIVE_LIST_PADDING;
@@ -162,7 +170,6 @@ $ACTIVE_LIST_PADDING: 10px;
 	border-width: 2px;
 	border-style: solid;
 	border-color: $gray-lighter;
-	margin-bottom: $ACTIVE_LIST_MARGIN;
 	transition: border-color 200ms ease-in;
 	outline: 0px;
 }
@@ -180,4 +187,8 @@ $ACTIVE_LIST_PADDING: 10px;
 .fade-in {
   opacity:1;
   animation : fadein 400ms linear;
+}
+
+#item-form {
+
 }

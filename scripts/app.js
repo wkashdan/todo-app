@@ -8,11 +8,13 @@ function main() {
 	let lists = getLists();
 	let appData = {
 		lists: lists,
-		selectedList: lists[Object.keys(lists)[0]]
+		selectedList: lists[Object.keys(lists)[0]],
+		selectedListEl: null
 	}
 	setListeners(appData);
 	listsToView(appData.lists);
 	selectedListToView(appData.selectedList);
+	selectList(document.getElementById('myLists').firstElementChild, appData);
 }
 
 function setListeners(appData) {
@@ -20,11 +22,19 @@ function setListeners(appData) {
 		event.preventDefault();
 		addList(createList(event.target.mylistInput.value), appData);
 	});
-
 	
 	document.getElementById('itemForm').addEventListener('submit',function(event) {
 		event.preventDefault();
 		addItem(createItem(event.target.itemInput.value), appData);
+		event.target.reset();
+	});
+
+	document.getElementById('myLists').addEventListener('click',function(event) {
+		event.preventDefault();
+		if(event.target.tagName === 'LI') {
+			console.log(event.target.getAttribute('data-list'));
+			selectList(event.target, appData);
+		}
 	});
 
 }
@@ -53,13 +63,15 @@ function listsToView(lists) {
 function listToListEl(list) {
 	let listEl = document.createElement('li');
 	listEl.innerHTML = list.name;
+	listEl.setAttribute('data-list', JSON.stringify(list));
 	addClass(listEl, 'mylist-item');
 	return listEl;
 }
 
 function createList(name) {
 	return {
-		name:name
+		name:name,
+		items:[]
 	}
 }
 
@@ -70,10 +82,12 @@ function addList(list, appData) {
 	let listEl = listToListEl(list);
 	addClass(listEl, 'fade-in');
 	myListsEl.appendChild(listEl);
+	selectList(listEl, appData);
 }
 
 function selectedListToView(selectedList) {
 	let selectedListEl = document.getElementById('selectedList');
+	selectedListEl.innerHTML = '';
 	for(item in selectedList.items) {
 		selectedListEl.appendChild(itemToItemEl(selectedList.items[item]));
 	}
@@ -88,16 +102,26 @@ function itemToItemEl(item) {
 
 function createItem(name) {
 	return {
-		name: name,
-		items:[]
+		name: name
 	}
 }
 
 function addItem(item, appData) {
 	appData.selectedList.items.push(item);
+	appData.selectedListEl.setAttribute('data-list',JSON.stringify(appData.selectedList));
 	console.log(appData);
 	let myListsEl = document.getElementById('selectedList');
 	let itemEl = itemToItemEl(item);
 	addClass(itemEl, 'fade-in');
 	myListsEl.appendChild(itemEl);
+}
+
+function selectList(listEl, appData) {
+	if(appData.selectedListEl != null) {
+		removeClass(appData.selectedListEl, 'active-list-item-selected');
+	}
+	appData.selectedListEl = listEl;
+	addClass(listEl, 'active-list-item-selected');
+	appData.selectedList = JSON.parse(listEl.getAttribute('data-list'));
+	selectedListToView(appData.selectedList);
 }
