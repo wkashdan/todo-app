@@ -133,6 +133,55 @@ main {
   border-width: 2px;
   transition: border-color 200ms ease-in; }
 
+.item-checkbox {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  vertical-align: middle;
+  background-color: #FFFFFF;
+  margin-right: 15px;
+  border: 2px solid #b4b4b4;
+  transition: border-color 200ms ease-in, opacity 200ms ease-in, text-decoration 200ms ease-in; }
+
+.item-checkbox-checked {
+  background-color: #36469c;
+  border-color: #36469c;
+  opacity: 0.4;
+  transition: opacity 200ms ease-in; }
+
+.item-checkbox-checked:hover {
+  opacity: .6;
+  transition: opacity 200ms ease-in; }
+
+.item-checkbox:hover {
+  border-color: #36469c;
+  transition: border-color 200ms ease-in, opacity 200ms ease-in; }
+
+.item-completed {
+  opacity: .3 !important;
+  text-decoration: line-through;
+  transition: opacity 200ms ease-in, border-color 200ms ease-in, text-decoration 200ms ease-in !important; }
+
+.delete-button {
+  width: 15px;
+  height: 15px;
+  background-color: #d9534f;
+  opacity: .2;
+  display: inline-block;
+  float: right;
+  border: 2px #d9534f solid;
+  color: #FFFFFF;
+  vertical-align: middle;
+  text-align: center;
+  line-height: 16px;
+  font-size: 18px;
+  font-weight: 400;
+  transition: opacity 200ms linear; }
+
+.delete-button:hover {
+  opacity: 1;
+  transition: opacity 200ms linear; }
+
 @keyframes fadein {
   0% {
     opacity: 0; }
@@ -140,6 +189,23 @@ main {
     opacity: 1; } }
 .fade-in {
   opacity: 1;
-  animation: fadein 400ms linear; }
+  animation: fadein 200ms linear; }
+
+@keyframes checked-fadein {
+  0% {
+    opacity: 0.4; }
+  100% {
+    opacity: 1; } }
+.checked-fadein {
+  opacity: 1 !important;
+  animation: fadein 200ms linear; }
+
+@keyframes fadeout {
+  50% {
+    opacity: 0; }
+  100% {
+    opacity: 0; } }
+.fadeout-el {
+  animation: fadeout 800ms linear; }
 
 /*# sourceMappingURL=styles.css.map */

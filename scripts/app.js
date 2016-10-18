@@ -6,21 +6,24 @@ document.onreadystatechange = function() {
 
 function main() {
 	let lists = getLists();
+	
 	let appData = {
 		lists: lists,
 		selectedList: lists[Object.keys(lists)[0]],
-		selectedListEl: null
+		selectedListEl: null,
+		selectedItem: null,
+		selectedItemEl: null
 	}
 	setListeners(appData);
-	listsToView(appData.lists);
-	selectedListToView(appData.selectedList);
-	selectList(document.getElementById('myLists').firstElementChild, appData);
+	listsToView(appData);
+	selectedListToView(appData);
 }
 
 function setListeners(appData) {
 	document.getElementById('myListForm').addEventListener('submit',function(event) {
 		event.preventDefault();
 		addList(createList(event.target.mylistInput.value), appData);
+		event.target.reset();
 	});
 	
 	document.getElementById('itemForm').addEventListener('submit',function(event) {
@@ -30,10 +33,20 @@ function setListeners(appData) {
 	});
 
 	document.getElementById('myLists').addEventListener('click',function(event) {
-		event.preventDefault();
 		if(event.target.tagName === 'LI') {
-			console.log(event.target.getAttribute('data-list'));
 			selectList(event.target, appData);
+		}
+	});
+
+	document.getElementById('selectedList').addEventListener('click', function(event) {
+		if(event.target.tagName === 'LI') {
+			selectItem(event.target, appData);
+		} else if(event.target.tagName === 'SPAN') {
+			selectItem(event.target.parentElement, appData);
+		} else if(event.target.className.indexOf('item-checkbox') > -1) {
+			toggleCheckItem(event.target.parentElement, appData);
+		} else if(event.target.className.indexOf('delete-button') > -1) {
+			deleteItem(event.target.parentElement, appData);
 		}
 	});
 
@@ -45,7 +58,7 @@ function getLists() {
 		'Agenda':{
 			name:'Agenda',
 			items:[
-				{name:'Go to Gym'}
+				{name:'Go to Gym', isComplete:false, isDeleted: false}
 			]
 		}
 	};
@@ -53,17 +66,20 @@ function getLists() {
 	return lists;
 }
 
-function listsToView(lists) {
+function listsToView(appData) {
 	let myListsEl = document.getElementById('myLists');
-	for(list in lists) {
-		myListsEl.appendChild(listToListEl(lists[list]));
+	for(list in appData.lists) {
+		myListsEl.appendChild(listToListEl(appData.lists[list]));
 	}
+
+	appData.selectedListEl = myListsEl.firstElementChild;
+	addClass(appData.selectedListEl, 'active-list-item-selected');
 }
 
 function listToListEl(list) {
 	let listEl = document.createElement('li');
 	listEl.innerHTML = list.name;
-	listEl.setAttribute('data-list', JSON.stringify(list));
+	listEl.setAttribute('data-list-name', list.name);
 	addClass(listEl, 'mylist-item');
 	return listEl;
 }
@@ -85,43 +101,104 @@ function addList(list, appData) {
 	selectList(listEl, appData);
 }
 
-function selectedListToView(selectedList) {
-	let selectedListEl = document.getElementById('selectedList');
+function selectedListToView(appData) {
+	let selectedListEl = document.getElementById('selectedList');;
 	selectedListEl.innerHTML = '';
-	for(item in selectedList.items) {
-		selectedListEl.appendChild(itemToItemEl(selectedList.items[item]));
+	for(item in appData.selectedList.items) {
+		if(!appData.selectedList.items[item].isDeleted) {
+			selectedListEl.appendChild(itemToItemEl(appData.selectedList.items[item], item));
+		}
 	}
 }
 
-function itemToItemEl(item) {
+function itemToItemEl(item, arPosition) {
 	let itemEl = document.createElement('li');
-	itemEl.innerHTML = item.name;
+	let itemNameEl = document.createElement('span');
+	let itemCheckBox = document.createElement('div');
+	let itemDeleteBtn = document.createElement('div');
+
+	itemEl.setAttribute('data-item', JSON.stringify(item));
+	itemEl.setAttribute('data-ar-pos', arPosition);
+
+	addClass(itemCheckBox, 'item-checkbox');
 	addClass(itemEl, 'active-list-item');
+	addClass(itemDeleteBtn, 'delete-button');
+
+	itemNameEl.innerHTML = item.name;
+	itemDeleteBtn.innerHTML = 'X';
+
+	if(item.isComplete) {
+		addClass(itemEl, 'item-completed');
+		addClass(itemCheckBox, 'item-checkbox-checked');
+	}
+
+	itemEl.appendChild(itemCheckBox);
+	itemEl.appendChild(itemNameEl);
+	itemEl.appendChild(itemDeleteBtn);
+
 	return itemEl;
 }
 
 function createItem(name) {
 	return {
-		name: name
+		name: name,
+		isComplete: false,
+		isDeleted: false
 	}
 }
 
 function addItem(item, appData) {
 	appData.selectedList.items.push(item);
-	appData.selectedListEl.setAttribute('data-list',JSON.stringify(appData.selectedList));
-	console.log(appData);
 	let myListsEl = document.getElementById('selectedList');
-	let itemEl = itemToItemEl(item);
+	let itemEl = itemToItemEl(item, appData.selectedList.items.length - 1);
 	addClass(itemEl, 'fade-in');
 	myListsEl.appendChild(itemEl);
+	selectItem(itemEl, appData);
+	window.setTimeout(function(){removeClass(itemEl, 'fade-in')}, 200);
 }
 
 function selectList(listEl, appData) {
+	appData.selectedItemEl = null;
+	appData.selectedItem = null;
+	appData.selectedList = appData.lists[listEl.getAttribute('data-list-name')];
 	if(appData.selectedListEl != null) {
 		removeClass(appData.selectedListEl, 'active-list-item-selected');
 	}
 	appData.selectedListEl = listEl;
-	addClass(listEl, 'active-list-item-selected');
-	appData.selectedList = JSON.parse(listEl.getAttribute('data-list'));
-	selectedListToView(appData.selectedList);
+	addClass(appData.selectedListEl, 'active-list-item-selected');
+	selectedListToView(appData);
+}
+
+function selectItem(itemEl, appData) {
+	console.log('List selected');
+	if(appData.selectedItemEl != null) {
+		removeClass(appData.selectedItemEl, 'active-list-item-selected');
+	}
+	appData.selectedItemEl = itemEl;
+	addClass(itemEl, 'active-list-item-selected');
+	appData.selectedItem = JSON.parse(itemEl.getAttribute('data-item'));
+	//item details to view
+}
+
+function toggleCheckItem(itemEl, appData) {
+	var checkState = appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isComplete;
+	if(checkState) {
+		appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isComplete = false;
+		addClass(itemEl, 'checked-fadein');
+		removeClass(itemEl, 'item-completed');
+		removeClass(itemEl.firstElementChild, 'item-checkbox-checked');
+
+	} else {
+		appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isComplete = true;
+		removeClass(itemEl, 'checked-fadein');
+		addClass(itemEl, 'item-completed');
+		addClass(itemEl.firstElementChild, 'item-checkbox-checked');
+	}
+	
+}
+
+function deleteItem(itemEl, appData) {
+	appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isDeleted = true;
+	addClass(itemEl, 'fadeout-el');
+	window.setTimeout(function(){itemEl.remove();},500);
 }
