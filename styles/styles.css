@@ -42,7 +42,7 @@ main {
   margin: 0px;
   padding: 0px; }
 
-.mylist-item {
+.mylist-el {
   color: #FFFFFF;
   background-color: #b4b4b4;
   list-style: none;
@@ -58,7 +58,7 @@ main {
   transition: border-color 200ms ease-in, opacity 200ms ease-in;
   cursor: pointer; }
 
-.mylist-item:hover {
+.mylist-el:hover {
   border-color: #555555;
   transition: border-color 200ms ease-in; }
 
@@ -87,11 +87,43 @@ main {
 
 /* active-list stles */
 .main-content {
-  margin-top: 15px;
+  margin-top: 20px;
   margin-left: auto;
   margin-right: auto;
   max-width: 400px;
   padding: 0px; }
+
+.list-title {
+  color: #b4b4b4;
+  font-size: 24px;
+  font-weight: 600;
+  display: inline-block; }
+
+.list-header {
+  height: 20px; }
+
+.delete-list-button {
+  color: #FFFFFF;
+  background-color: #d9534f;
+  padding: 6px 8px 6px 8px;
+  margin: 0px;
+  border: 0px;
+  cursor: pointer;
+  opacity: .2;
+  transition: opacity 200ms ease-in; }
+
+.delete-list-button:hover {
+  opacity: 1;
+  transition: opacity 200ms ease-in; }
+
+.delete-list-button:focus {
+  outline: 0px; }
+
+.pull-right {
+  float: right; }
+
+.pull-left {
+  float: left; }
 
 .active-list {
   list-style: none; }
@@ -102,7 +134,7 @@ main {
   border-style: solid;
   background-color: #eeeeee;
   padding: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   color: #b4b4b4;
   transition: border-color 200ms ease-in; }
 

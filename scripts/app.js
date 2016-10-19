@@ -12,43 +12,96 @@ function main() {
 		selectedList: lists[Object.keys(lists)[0]],
 		selectedListEl: null,
 		selectedItem: null,
-		selectedItemEl: null
+		selectedItemEl: null,
+		myListsEl: document.getElementById('myListsEl')
 	}
+	setMyListsView(appData.lists, appData.myListsEl);
+	selectList(appData.selectedList.name, appData.myListsEl.firstElementChild, appData);
 	setListeners(appData);
-	listsToView(appData);
-	selectedListToView(appData);
 }
 
 function setListeners(appData) {
 	document.getElementById('myListForm').addEventListener('submit',function(event) {
 		event.preventDefault();
-		addList(createList(event.target.mylistInput.value), appData);
-		event.target.reset();
+		let listName = event.target.mylistInput.value;
+		if(!appData.lists.hasOwnProperty(listName)) {
+			let myList = addListToLists(
+							createList(listName), 
+							appData.lists);
+			let myListEl = addListToMyListView(myList);
+			selectList(myList.name, myListEl, appData);
+			event.target.reset();
+		} else {
+			alert('You already have a list with this name!');
+		}
+		
 	});
 	
 	document.getElementById('itemForm').addEventListener('submit',function(event) {
 		event.preventDefault();
-		addItem(createItem(event.target.itemInput.value), appData);
+		let listItem = addListItemToList(
+			createItem(event.target.itemInput.value), 
+			appData.selectedList.items);
+		let itemPos = appData.selectedList.items.length - 1;
+		let listItemEl = addListItemToView(listItem, itemPos);
+
 		event.target.reset();
 	});
 
-	document.getElementById('myLists').addEventListener('click',function(event) {
-		if(event.target.tagName === 'LI') {
-			selectList(event.target, appData);
+	document.getElementById('myListsEl').addEventListener('click',function(event) {
+		let targetEl = event.target;
+		if(targetEl.hasAttribute('data-el-type') && 
+			targetEl.getAttribute('data-el-type') === 'myListEl') {
+			selectList(targetEl.getAttribute('data-list-name'), targetEl, appData);
 		}
 	});
 
-	document.getElementById('selectedList').addEventListener('click', function(event) {
-		if(event.target.tagName === 'LI') {
-			selectItem(event.target, appData);
-		} else if(event.target.tagName === 'SPAN') {
-			selectItem(event.target.parentElement, appData);
-		} else if(event.target.className.indexOf('item-checkbox') > -1) {
-			toggleCheckItem(event.target.parentElement, appData);
-		} else if(event.target.className.indexOf('delete-button') > -1) {
-			deleteItem(event.target.parentElement, appData);
+	document.getElementById('selectedListEl').addEventListener('click', function(event) {
+		let targ = event.target;
+		if(targ.hasAttribute('data-el-type')) {
+
+			switch(targ.getAttribute('data-el-type')) {
+				case 'listItemEl':
+					selectItem(targ.getAttribute('data-ar-pos'), targ, appData);
+					break;
+				case 'listItemName':
+					selectItem(targ.parentElement.getAttribute('data-ar-pos'), 
+								targ.parentElement, 
+								appData);
+					break;
+				case 'listItemCheckBox':
+					toggleCheckItem(targ.parentElement.getAttribute('data-ar-pos'),
+						targ.parentElement, 
+						appData.selectedList.items);
+					break;
+				case 'listItemDeleteBtn':
+					deleteItem(targ.parentElement.getAttribute('data-ar-pos'),
+						targ.parentElement,
+						appData.selectedList.items);
+					break;
+			}
 		}
 	});
+
+	document.getElementById('listHeader').addEventListener('click', function(event) {
+		let targ = event.target;
+
+		if(targ.hasAttribute('data-el-type') && 
+			targ.getAttribute('data-el-type') === 'listDeleteBtn' &&
+			Object.keys(appData.lists).length > 1) {
+			delete appData.lists[appData.selectedList.name];
+			addClass(appData.selectedListEl, 'fadeout-el');
+			window.setTimeout(function() {
+				appData.selectedListEl.remove();
+				let myListEl = document.getElementById('myListsEl').firstElementChild;
+				selectList(Object.keys(appData.lists)[0], myListEl, appData);
+			}, 500)
+
+			
+		} else {
+			alert(`You only have one list left! Don't delete it!`);
+		}
+	})
 
 }
 
@@ -59,54 +112,82 @@ function getLists() {
 			name:'Agenda',
 			items:[
 				{name:'Go to Gym', isComplete:false, isDeleted: false}
-			]
+			],
+			isDeleted: false
 		}
 	};
 
 	return lists;
 }
 
-function listsToView(appData) {
-	let myListsEl = document.getElementById('myLists');
-	for(list in appData.lists) {
-		myListsEl.appendChild(listToListEl(appData.lists[list]));
+/*
+* Purpose: To set the list items in the myLists element
+* Consumes: a lists object, and a myLists Element
+* Produces: nothing
+* Action: creates a myList element for each list and 
+* adds it to the myList element
+* 
+*/
+function setMyListsView(lists, myListsEl) {
+	for(list in lists) {
+		myListsEl.appendChild(listToMyListEl(lists[list]));
 	}
-
-	appData.selectedListEl = myListsEl.firstElementChild;
-	addClass(appData.selectedListEl, 'active-list-item-selected');
 }
 
-function listToListEl(list) {
+function listToMyListEl(list) {
 	let listEl = document.createElement('li');
 	listEl.innerHTML = list.name;
 	listEl.setAttribute('data-list-name', list.name);
-	addClass(listEl, 'mylist-item');
+	listEl.setAttribute('data-el-type', 'myListEl');
+	addClass(listEl, 'mylist-el');
 	return listEl;
 }
 
 function createList(name) {
 	return {
 		name:name,
-		items:[]
+		items:[],
+		isDeleted: false
 	}
 }
 
-function addList(list, appData) {
-	appData.lists[list.name] = {name:list.name, items:[]};
-	console.log(appData);
-	let myListsEl = document.getElementById('myLists');
-	let listEl = listToListEl(list);
-	addClass(listEl, 'fade-in');
-	myListsEl.appendChild(listEl);
-	selectList(listEl, appData);
+function addListToLists(list, lists) {
+	lists[list.name] = list;
+	return lists[list.name];
 }
 
-function selectedListToView(appData) {
-	let selectedListEl = document.getElementById('selectedList');;
+function addListToMyListView(list) {
+	let myListsEl = document.getElementById('myListsEl');
+	let myListEl = listToMyListEl(list);
+	addClass(myListEl, 'fade-in');
+	myListsEl.appendChild(myListEl);
+	return myListEl;
+}
+
+function updateSelectedListView(list) {
+
+	let selectedListHeader = document.getElementById('listHeader');
+
+	let listTitle = document.createElement('h2');
+	listTitle.innerHTML = list.name;
+	addClass(listTitle, 'list-title');
+	addClass(listTitle, 'pull-left');
+
+	let listDeleteBtn = document.createElement('button');
+	listDeleteBtn.innerHTML = 'Delete List';
+	listDeleteBtn.setAttribute('data-el-type','listDeleteBtn');
+	addClass(listDeleteBtn, 'delete-list-button');
+	addClass(listDeleteBtn, 'pull-right');
+
+	selectedListHeader.innerHTML = '';
+	selectedListHeader.appendChild(listTitle);
+	selectedListHeader.appendChild(listDeleteBtn);
+
+	let selectedListEl = document.getElementById('selectedListEl');;
 	selectedListEl.innerHTML = '';
-	for(item in appData.selectedList.items) {
-		if(!appData.selectedList.items[item].isDeleted) {
-			selectedListEl.appendChild(itemToItemEl(appData.selectedList.items[item], item));
+	for(item in list.items) {
+		if(!list.items[item].isDeleted) {
+			selectedListEl.appendChild(itemToItemEl(list.items[item], item));
 		}
 	}
 }
@@ -117,8 +198,11 @@ function itemToItemEl(item, arPosition) {
 	let itemCheckBox = document.createElement('div');
 	let itemDeleteBtn = document.createElement('div');
 
-	itemEl.setAttribute('data-item', JSON.stringify(item));
 	itemEl.setAttribute('data-ar-pos', arPosition);
+	itemEl.setAttribute('data-el-type','listItemEl');
+	itemNameEl.setAttribute('data-el-type','listItemName');
+	itemCheckBox.setAttribute('data-el-type','listItemCheckBox');
+	itemDeleteBtn.setAttribute('data-el-type','listItemDeleteBtn');
 
 	addClass(itemCheckBox, 'item-checkbox');
 	addClass(itemEl, 'active-list-item');
@@ -147,49 +231,67 @@ function createItem(name) {
 	}
 }
 
-function addItem(item, appData) {
-	appData.selectedList.items.push(item);
-	let myListsEl = document.getElementById('selectedList');
-	let itemEl = itemToItemEl(item, appData.selectedList.items.length - 1);
-	addClass(itemEl, 'fade-in');
-	myListsEl.appendChild(itemEl);
-	selectItem(itemEl, appData);
-	window.setTimeout(function(){removeClass(itemEl, 'fade-in')}, 200);
+function addListItemToList(listItem, items) {
+	items.push(listItem);
+	return items[items.length - 1];
 }
 
-function selectList(listEl, appData) {
+function addListItemToView(listItem, arPos) {
+	let myListsEl = document.getElementById('selectedListEl');
+	let listItemEl = itemToItemEl(listItem, arPos);
+	addClass(listItemEl, 'fade-in');
+	myListsEl.appendChild(listItemEl);
+	window.setTimeout(function(){removeClass(listItemEl, 'fade-in')}, 200);
+	return listItemEl;
+}
+
+function selectList(listName, selectedListEl, appData) {
 	appData.selectedItemEl = null;
 	appData.selectedItem = null;
-	appData.selectedList = appData.lists[listEl.getAttribute('data-list-name')];
-	if(appData.selectedListEl != null) {
-		removeClass(appData.selectedListEl, 'active-list-item-selected');
-	}
-	appData.selectedListEl = listEl;
-	addClass(appData.selectedListEl, 'active-list-item-selected');
-	selectedListToView(appData);
+
+	let prevSelectedListEl = appData.selectedListEl;
+
+	appData.selectedList = appData.lists[listName];
+	appData.selectedListEl = selectedListEl;
+
+	updateSelectedMyListEl(prevSelectedListEl, selectedListEl);
+	updateSelectedListView(appData.selectedList);
 }
 
-function selectItem(itemEl, appData) {
-	console.log('List selected');
-	if(appData.selectedItemEl != null) {
-		removeClass(appData.selectedItemEl, 'active-list-item-selected');
+function updateSelectedMyListEl(prevEl, selectedListEl) {
+	if(prevEl != null) {
+		removeClass(prevEl, 'active-list-item-selected');
 	}
+	addClass(selectedListEl, 'active-list-item-selected');
+}
+
+function selectItem(itemPos, itemEl, appData) {
+
+	let prevItemEl = appData.selectedItemEl;
+
+	appData.selectedItem = appData.selectedList.items[itemPos];
 	appData.selectedItemEl = itemEl;
-	addClass(itemEl, 'active-list-item-selected');
-	appData.selectedItem = JSON.parse(itemEl.getAttribute('data-item'));
-	//item details to view
+
+	updateSelectedItemView(prevItemEl, itemEl);
 }
 
-function toggleCheckItem(itemEl, appData) {
-	var checkState = appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isComplete;
+function updateSelectedItemView(prevItemEl, itemEl) {
+	if(prevItemEl != null) {
+		removeClass(prevItemEl, 'active-list-item-selected');
+	}
+	addClass(itemEl, 'active-list-item-selected');
+}
+
+function toggleCheckItem(itemPos, itemEl, items) {
+	var checkState = items[itemPos].isComplete;
 	if(checkState) {
-		appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isComplete = false;
+		items[itemPos].isComplete = false;
 		addClass(itemEl, 'checked-fadein');
 		removeClass(itemEl, 'item-completed');
 		removeClass(itemEl.firstElementChild, 'item-checkbox-checked');
 
 	} else {
-		appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isComplete = true;
+		items[itemPos].isComplete = true;
 		removeClass(itemEl, 'checked-fadein');
 		addClass(itemEl, 'item-completed');
 		addClass(itemEl.firstElementChild, 'item-checkbox-checked');
@@ -197,8 +299,8 @@ function toggleCheckItem(itemEl, appData) {
 	
 }
 
-function deleteItem(itemEl, appData) {
-	appData.selectedList.items[itemEl.getAttribute('data-ar-pos')].isDeleted = true;
+function deleteItem(itemPos, itemEl, items) {
+	items[itemPos].isDeleted = true;
 	addClass(itemEl, 'fadeout-el');
 	window.setTimeout(function(){itemEl.remove();},500);
 }
