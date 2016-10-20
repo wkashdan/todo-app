@@ -26,10 +26,7 @@ main {
 
 /* LIST NAV */
 .mylist-nav {
-  background-color: #eeeeee;
-  width: 220px;
-  height: 100%;
-  float: left; }
+  background-color: #eeeeee; }
 
 .mylist-header {
   color: #b4b4b4;
@@ -80,11 +77,6 @@ main {
   transition: border-color 200ms ease-in; }
 
 /* content-section */
-.content {
-  width: calc(100% - 220px);
-  float: right;
-  height: 100%; }
-
 /* active-list stles */
 .main-content {
   margin-top: 20px;
@@ -239,5 +231,22 @@ main {
     opacity: 0; } }
 .fadeout-el {
   animation: fadeout 800ms linear; }
+
+@media (min-width: 650px) {
+  .mylist-nav {
+    width: 220px;
+    height: 100%;
+    float: left; }
+
+  .content {
+    width: calc(100% - 220px);
+    float: right;
+    height: 100%; } }
+@media (max-width: 650px) {
+  .mylist-nav {
+    background-color: #FFFFFF; }
+
+  .content {
+    padding: 10px; } }
 
 /*# sourceMappingURL=styles.css.map */
