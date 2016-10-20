@@ -5,7 +5,6 @@ document.onreadystatechange = function() {
 }
 
 function main() {
-
 	let lists = getLists();
 	
 	let appData = {
@@ -114,7 +113,9 @@ function setListeners(appData) {
 			}, 500)
 
 			
-		} else {
+		} else if(targ.hasAttribute('data-el-type') && 
+			targ.getAttribute('data-el-type') === 'listDeleteBtn' &&
+			Object.keys(appData.lists).length === 1) {
 			alert(`You only have one list left! Don't delete it!`);
 		}
 	})
@@ -130,7 +131,7 @@ function setListeners(appData) {
 * 
 */
 function setMyListsView(lists, myListsEl) {
-	for(list in lists) {
+	for(let list in lists) {
 		myListsEl.appendChild(listToMyListEl(lists[list]));
 	}
 }
@@ -197,7 +198,7 @@ function updateSelectedListView(list) {
 
 	let selectedListEl = document.getElementById('selectedListEl');;
 	selectedListEl.innerHTML = '';
-	for(item in list.items) {
+	for(let item in list.items) {
 		if(!list.items[item].isDeleted) {
 			selectedListEl.appendChild(itemToItemEl(list.items[item], item));
 		}

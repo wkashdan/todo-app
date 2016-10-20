@@ -7,8 +7,9 @@
   <title>JavaScript ToDo App</title>
   <meta name="description" content="JavaScript Todo List Application">
   <meta name="author" content="Will Kashdan">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="./styles/styles.css">
+  <link rel="stylesheet" href="./dist/styles.css">
 
   <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
@@ -31,18 +32,15 @@
     <section class="content">
 
       <div id="listHeader" class="main-content list-header">
-        <h2 class="list-title pull-left">List Title</h2>
-        <button class="delete-list-button pull-right">Delete List</button>
       </div>
       <form class="main-content" id="itemForm">
         <input name="itemInput" class="todo-input" placeholder="Add Item..." type="text" autocomplete="off">
       </form>
       <ul id="selectedListEl" class="main-content active-list">
-        <li class="active-list-item"><div class="item-checkbox"></div>Test Element<div class="delete-button">x</div></li>
       </ul>
     </section>
   </main>
-  <script src="./scripts/util.js"></script>
-  <script src="./scripts/app.js"></script>
+  <script src="./dist/util.js"></script>
+  <script src="./dist/app.js"></script>
 </body>
 </html>

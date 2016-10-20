@@ -1,6 +1,8 @@
 # todo-app
 
-This is a To-Do List JavaScript Application. It uses functional plain JavaScript with no third party packages (except in development). 
+This is a To-Do List JavaScript Application. It uses functional plain JavaScript with no third party packages. It uses the localStorage HTML5 API to store data and works completely offline. 
+
+View the demo at http://wkashdan.com/todo-app
 
 If you have feedback for me please feel free to contact me, leave a comment or tweet at me @BlueHenWill 
 
@@ -9,7 +11,21 @@ If you have feedback for me please feel free to contact me, leave a comment or t
 - To build a small application with no third party packages
 - To gain a better understanding of current development tools by manually configuring them
 
+## Dev Tools
 
+This project currently uses NPM, Sass, Babel. I made an intentional decision to not use Grunt, Gulp, Browserify, Webpack etc.
+
+If you'd like to run this project yourself you will need sass, node's http-server, and npm already globally installed (I should setup sass and http-server as local dependencies).
+
+You cna then do the following to install dependencies, build, and run the server:
+
+```
+npm install
+```
+
+```
+npm run build-run
+```
 
 ## Data Binding in Plain JavaScript/HTML
 
