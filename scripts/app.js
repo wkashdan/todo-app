@@ -105,6 +105,7 @@ function setListeners(appData) {
 			targ.getAttribute('data-el-type') === 'listDeleteBtn' &&
 			Object.keys(appData.lists).length > 1) {
 			delete appData.lists[appData.selectedList.name];
+			saveListsToLocalStore(appData.lists);
 			addClass(appData.selectedListEl, 'fadeout-el');
 			window.setTimeout(function() {
 				appData.selectedListEl.remove();
