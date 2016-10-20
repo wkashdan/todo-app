@@ -19,3 +19,18 @@ function removeClass(el, className) {
     el.className=el.className.replace(reg, ' ')
   }
 }
+
+function setLocalStore(key, obj) {
+  if(typeof(Storage) !== 'undefined') {
+    localStorage.setItem(key, JSON.stringify(obj));
+  }
+  return obj;
+}
+
+function getLocalStore(key, obj) {
+  if(typeof(Storage) !== 'undefined') {
+    return JSON.parse(localStorage.getItem(key));
+  } else {
+    return null;
+  }
+}

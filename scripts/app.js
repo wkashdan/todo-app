@@ -5,6 +5,7 @@ document.onreadystatechange = function() {
 }
 
 function main() {
+
 	let lists = getLists();
 	
 	let appData = {
@@ -20,16 +21,32 @@ function main() {
 	setListeners(appData);
 }
 
+function getLists() {
+	if(typeof(Storage) !== 'undefined') {
+		let lists = getLocalStore('lists');
+		if(lists !== null && Object.keys(lists).length > 0) {
+			return lists;
+		} 
+	} 
+	let lists =
+	{
+		'Agenda':{
+			name:'Agenda',
+			items:[
+				{name:'Go to Gym', isComplete:false, isDeleted: false}
+			],
+			isDeleted: false
+		}
+	};
+	return lists;
+}
+
 function setListeners(appData) {
 	document.getElementById('myListForm').addEventListener('submit',function(event) {
 		event.preventDefault();
 		let listName = event.target.mylistInput.value;
 		if(!appData.lists.hasOwnProperty(listName)) {
-			let myList = addListToLists(
-							createList(listName), 
-							appData.lists);
-			let myListEl = addListToMyListView(myList);
-			selectList(myList.name, myListEl, appData);
+			handleNewList(listName, appData.lists, appData);
 			event.target.reset();
 		} else {
 			alert('You already have a list with this name!');
@@ -39,12 +56,8 @@ function setListeners(appData) {
 	
 	document.getElementById('itemForm').addEventListener('submit',function(event) {
 		event.preventDefault();
-		let listItem = addListItemToList(
-			createItem(event.target.itemInput.value), 
-			appData.selectedList.items);
-		let itemPos = appData.selectedList.items.length - 1;
-		let listItemEl = addListItemToView(listItem, itemPos);
-
+		let itemName = event.target.itemInput.value;
+		handleNewListItem(itemName, appData);
 		event.target.reset();
 	});
 
@@ -73,11 +86,13 @@ function setListeners(appData) {
 					toggleCheckItem(targ.parentElement.getAttribute('data-ar-pos'),
 						targ.parentElement, 
 						appData.selectedList.items);
+					saveListsToLocalStore(appData.lists);
 					break;
 				case 'listItemDeleteBtn':
 					deleteItem(targ.parentElement.getAttribute('data-ar-pos'),
 						targ.parentElement,
 						appData.selectedList.items);
+					saveListsToLocalStore(appData.lists);
 					break;
 			}
 		}
@@ -105,21 +120,6 @@ function setListeners(appData) {
 
 }
 
-function getLists() {
-	let lists =
-	{
-		'Agenda':{
-			name:'Agenda',
-			items:[
-				{name:'Go to Gym', isComplete:false, isDeleted: false}
-			],
-			isDeleted: false
-		}
-	};
-
-	return lists;
-}
-
 /*
 * Purpose: To set the list items in the myLists element
 * Consumes: a lists object, and a myLists Element
@@ -141,6 +141,17 @@ function listToMyListEl(list) {
 	listEl.setAttribute('data-el-type', 'myListEl');
 	addClass(listEl, 'mylist-el');
 	return listEl;
+}
+
+function handleNewList(listName, lists, appData) {
+	let myList = addListToLists(createList(listName),lists);
+	saveListsToLocalStore(lists);
+	let myListEl = addListToMyListView(myList);
+	selectList(myList.name, myListEl, appData);
+}
+
+function saveListsToLocalStore(lists) {
+	setLocalStore('lists',lists);
 }
 
 function createList(name) {
@@ -190,6 +201,13 @@ function updateSelectedListView(list) {
 			selectedListEl.appendChild(itemToItemEl(list.items[item], item));
 		}
 	}
+}
+
+function handleNewListItem(itemName, appData) {
+	let listItem = addListItemToList(createItem(itemName), appData.selectedList.items);
+	let itemPos = appData.selectedList.items.length - 1;
+	addListItemToView(listItem, itemPos);
+	saveListsToLocalStore(appData.lists);
 }
 
 function itemToItemEl(item, arPosition) {
