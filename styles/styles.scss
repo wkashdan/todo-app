@@ -305,12 +305,14 @@ $CHECK_MARGIN: 15px;
 		width: $MYLIST_WIDTH;
 		height: 100%;
 		float: left;
+		overflow-y: auto;
 	}
 
 	.content {
 		width: calc(100% - #{$MYLIST_WIDTH});
 		float:right;
 		height: 100%;
+		overflow-y: auto;
 	}
 }
 
