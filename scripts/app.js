@@ -157,6 +157,7 @@ function handleCreateNewList(listName, todoAppData, todoService, todoViewSetter)
 	let newListMenuItemEl = todoViewSetter.addNewList(newList);
 	//select the new list in the view
 	todoViewSetter.setActiveListMenuItem(newListMenuItemEl);
+	todoViewSetter.setSelectedList(todoAppData.selectedList);
 }
 
 /*
