@@ -5,6 +5,11 @@ import {TodoList} from './TodoList';
 TodoService Singleton Class: This class is used to interface with the localStorage
 HTML5 api for the TodoApp Web Application
 
+==========================================================
+THIS SHOULD FOLLOW A SINGLETON PATTERN THOUGH NOT ENFORCED
+==========================================================
+
+
 */
 
 export class TodoService {
