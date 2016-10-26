@@ -1,97 +1,118 @@
+import {TodoService} from './TodoService';
+import {TodoAppData} from './TodoAppData';
+import {TodoViewFactory} from './TodoViewFactory';
+import {TodoViewSetter} from './TodoViewSetter';
+import {TodoList} from './TodoList';
+
+/*==================================
+app.js contains the application logic
+===================================*/
+
+/*
+Waits for DOM to be loaded, other resources are still loading
+*/
 document.onreadystatechange = function() {
 	if(document.readyState === 'interactive') {
 		main();
 	}
 }
 
+/*
+Equivalent of a main method
+*/
 function main() {
-	let lists = getLists();
-	
-	let appData = {
-		lists: lists,
-		selectedList: lists[Object.keys(lists)[0]],
-		selectedListEl: null,
-		selectedItem: null,
-		selectedItemEl: null,
-		myListsEl: document.getElementById('myListsEl')
-	}
-	setMyListsView(appData.lists, appData.myListsEl);
-	selectList(appData.selectedList.name, appData.myListsEl.firstElementChild, appData);
-	setListeners(appData);
+
+	//======================================
+	//THE FOLLOWING SHOULD ALL BE SINGLETONS
+	//======================================
+
+	//A service to get data and set data from localStorage API
+	let todoService = new TodoService();
+	//The todoApp Data model
+	let todoAppData = new TodoAppData(todoService.getLists());
+	//A class that helps create DOM elements imperatively
+	let todoViewFactory = new TodoViewFactory();
+	//Helps controll the view of the application
+	let todoViewSetter = new TodoViewSetter(todoViewFactory);
+
+	//initializes the view
+	todoViewSetter
+		.setListsMenu(todoAppData.lists)
+		.setSelectedList(todoAppData.selectedList);
+
+	//sets event listeners
+	setListeners(todoAppData, todoViewSetter, todoService);
 }
 
-function getLists() {
-	if(typeof(Storage) !== 'undefined') {
-		let lists = getLocalStore('lists');
-		if(lists !== null && Object.keys(lists).length > 0) {
-			return lists;
-		} 
-	} 
-	let lists =
-	{
-		'Agenda':{
-			name:'Agenda',
-			items:[
-				{name:'Go to Gym', isComplete:false, isDeleted: false}
-			],
-			isDeleted: false
-		}
-	};
-	return lists;
-}
+/*
+This function sets all the event listeners for the app.
+Future change: to create an TodoEventManager class for all event logic
+*/
+function setListeners(todoAppData, todoViewSetter, todoService) {
 
-function setListeners(appData) {
-	document.getElementById('myListForm').addEventListener('submit',function(event) {
+	setEventForId('submit','myListForm',function(event) {
 		event.preventDefault();
 		let listName = event.target.mylistInput.value;
-		if(!appData.lists.hasOwnProperty(listName)) {
-			handleNewList(listName, appData.lists, appData);
+		if(!todoAppData.lists.hasOwnProperty(listName)) {
+			handleCreateNewList(listName, todoAppData, todoService, todoViewSetter);
 			event.target.reset();
 		} else {
 			alert('You already have a list with this name!');
 		}
 		
 	});
-	
-	document.getElementById('itemForm').addEventListener('submit',function(event) {
+
+	setEventForId('submit','itemForm',function(event) {
 		event.preventDefault();
 		let itemName = event.target.itemInput.value;
-		handleNewListItem(itemName, appData);
+		handleCreateNewItem(itemName, todoAppData, todoService, todoViewSetter);
 		event.target.reset();
 	});
 
-	document.getElementById('myListsEl').addEventListener('click',function(event) {
+	
+
+	setEventForId('click','listMenu',function(event) {
 		let targetEl = event.target;
 		if(targetEl.hasAttribute('data-el-type') && 
 			targetEl.getAttribute('data-el-type') === 'myListEl') {
-			selectList(targetEl.getAttribute('data-list-name'), targetEl, appData);
+			handleSelectList(
+				targetEl.getAttribute('data-list-name'), 
+				targetEl,
+				todoAppData,
+				todoViewSetter);
 		}
 	});
 
-	document.getElementById('selectedListEl').addEventListener('click', function(event) {
+	setEventForId('click','selectedListEl', function(event) {
 		let targ = event.target;
 		if(targ.hasAttribute('data-el-type')) {
 
 			switch(targ.getAttribute('data-el-type')) {
 				case 'listItemEl':
-					selectItem(targ.getAttribute('data-ar-pos'), targ, appData);
+					handleSelectItem(targ.getAttribute('data-ar-pos'), 
+						targ, 
+						todoAppData, 
+						todoViewSetter);
 					break;
 				case 'listItemName':
-					selectItem(targ.parentElement.getAttribute('data-ar-pos'), 
-								targ.parentElement, 
-								appData);
+					handleSelectItem(targ.parentElement.getAttribute('data-ar-pos'), 
+						targ.parentElement, 
+						todoAppData, 
+						todoViewSetter);
 					break;
 				case 'listItemCheckBox':
-					toggleCheckItem(targ.parentElement.getAttribute('data-ar-pos'),
+					handleToggleCheckItem(targ.parentElement.getAttribute('data-ar-pos'),
 						targ.parentElement, 
-						appData.selectedList.items);
-					saveListsToLocalStore(appData.lists);
+						todoAppData,
+						todoViewSetter,
+						todoService);
 					break;
 				case 'listItemDeleteBtn':
-					deleteItem(targ.parentElement.getAttribute('data-ar-pos'),
+					handleDeleteItem(targ.parentElement.getAttribute('data-ar-pos'),
 						targ.parentElement,
-						appData.selectedList.items);
-					saveListsToLocalStore(appData.lists);
+						todoAppData,
+						todoViewSetter,
+						todoService);
 					break;
 			}
 		}
@@ -102,20 +123,11 @@ function setListeners(appData) {
 
 		if(targ.hasAttribute('data-el-type') && 
 			targ.getAttribute('data-el-type') === 'listDeleteBtn' &&
-			Object.keys(appData.lists).length > 1) {
-			delete appData.lists[appData.selectedList.name];
-			saveListsToLocalStore(appData.lists);
-			addClass(appData.selectedListEl, 'fadeout-el');
-			window.setTimeout(function() {
-				appData.selectedListEl.remove();
-				let myListEl = document.getElementById('myListsEl').firstElementChild;
-				selectList(Object.keys(appData.lists)[0], myListEl, appData);
-			}, 500)
-
-			
+			Object.keys(todoAppData.lists).length > 1) {
+			handleDeleteList(todoAppData, todoViewSetter, todoService);
 		} else if(targ.hasAttribute('data-el-type') && 
 			targ.getAttribute('data-el-type') === 'listDeleteBtn' &&
-			Object.keys(appData.lists).length === 1) {
+			Object.keys(todoAppData.lists).length === 1) {
 			alert(`You only have one list left! Don't delete it!`);
 		}
 	})
@@ -123,204 +135,88 @@ function setListeners(appData) {
 }
 
 /*
-* Purpose: To set the list items in the myLists element
-* Consumes: a lists object, and a myLists Element
-* Produces: nothing
-* Action: creates a myList element for each list and 
-* adds it to the myList element
-* 
+Purpose:This is a utility method that shortens the syntax of setting on event listener 
+on an element with an ID
 */
-function setMyListsView(lists, myListsEl) {
-	for(let list in lists) {
-		myListsEl.appendChild(listToMyListEl(lists[list]));
-	}
+function setEventForId(eventName, elementId, callback) {
+	document.getElementById(elementId)
+			.addEventListener(eventName, callback);
 }
 
-function listToMyListEl(list) {
-	let listEl = document.createElement('li');
-	listEl.innerHTML = list.name;
-	listEl.setAttribute('data-list-name', list.name);
-	listEl.setAttribute('data-el-type', 'myListEl');
-	addClass(listEl, 'mylist-el');
-	return listEl;
+/*
+Purpose: to handle the logic for creating a new list in model, view and storage
+*/
+function handleCreateNewList(listName, todoAppData, todoService, todoViewSetter) {
+	//create new list and add it to the model
+	let newList = todoAppData.addList(listName);
+	//select the new list in the model
+	todoAppData.setSelectedList(listName);
+	//save list to persistance storage
+	todoService.saveListsToLocalStore(todoAppData.lists);
+	//update view for new list
+	let newListMenuItemEl = todoViewSetter.addNewList(newList);
+	//select the new list in the view
+	todoViewSetter.setActiveListMenuItem(newListMenuItemEl);
 }
 
-function handleNewList(listName, lists, appData) {
-	let myList = addListToLists(createList(listName),lists);
-	saveListsToLocalStore(lists);
-	let myListEl = addListToMyListView(myList);
-	selectList(myList.name, myListEl, appData);
-}
-
-function saveListsToLocalStore(lists) {
-	setLocalStore('lists',lists);
-}
-
-function createList(name) {
-	return {
-		name:name,
-		items:[],
-		isDeleted: false
-	}
-}
-
-function addListToLists(list, lists) {
-	lists[list.name] = list;
-	return lists[list.name];
-}
-
-function addListToMyListView(list) {
-	let myListsEl = document.getElementById('myListsEl');
-	let myListEl = listToMyListEl(list);
-	addClass(myListEl, 'fade-in');
-	myListsEl.appendChild(myListEl);
-	return myListEl;
-}
-
-function updateSelectedListView(list) {
-
-	let selectedListHeader = document.getElementById('listHeader');
-
-	let listTitle = document.createElement('h2');
-	listTitle.innerHTML = list.name;
-	addClass(listTitle, 'list-title');
-	addClass(listTitle, 'pull-left');
-
-	let listDeleteBtn = document.createElement('button');
-	listDeleteBtn.innerHTML = 'Delete List';
-	listDeleteBtn.setAttribute('data-el-type','listDeleteBtn');
-	addClass(listDeleteBtn, 'delete-list-button');
-	addClass(listDeleteBtn, 'pull-right');
-
-	selectedListHeader.innerHTML = '';
-	selectedListHeader.appendChild(listTitle);
-	selectedListHeader.appendChild(listDeleteBtn);
-
-	let selectedListEl = document.getElementById('selectedListEl');;
-	selectedListEl.innerHTML = '';
-	for(let item in list.items) {
-		if(!list.items[item].isDeleted) {
-			selectedListEl.appendChild(itemToItemEl(list.items[item], item));
-		}
-	}
-}
-
-function handleNewListItem(itemName, appData) {
-	let listItem = addListItemToList(createItem(itemName), appData.selectedList.items);
-	let itemPos = appData.selectedList.items.length - 1;
-	addListItemToView(listItem, itemPos);
-	saveListsToLocalStore(appData.lists);
-}
-
-function itemToItemEl(item, arPosition) {
-	let itemEl = document.createElement('li');
-	let itemNameEl = document.createElement('span');
-	let itemCheckBox = document.createElement('div');
-	let itemDeleteBtn = document.createElement('div');
-
-	itemEl.setAttribute('data-ar-pos', arPosition);
-	itemEl.setAttribute('data-el-type','listItemEl');
-	itemNameEl.setAttribute('data-el-type','listItemName');
-	itemCheckBox.setAttribute('data-el-type','listItemCheckBox');
-	itemDeleteBtn.setAttribute('data-el-type','listItemDeleteBtn');
-
-	addClass(itemCheckBox, 'item-checkbox');
-	addClass(itemEl, 'active-list-item');
-	addClass(itemDeleteBtn, 'delete-button');
-
-	itemNameEl.innerHTML = item.name;
-	itemDeleteBtn.innerHTML = 'X';
-
-	if(item.isComplete) {
-		addClass(itemEl, 'item-completed');
-		addClass(itemCheckBox, 'item-checkbox-checked');
-	}
-
-	itemEl.appendChild(itemCheckBox);
-	itemEl.appendChild(itemNameEl);
-	itemEl.appendChild(itemDeleteBtn);
-
-	return itemEl;
-}
-
-function createItem(name) {
-	return {
-		name: name,
-		isComplete: false,
-		isDeleted: false
-	}
-}
-
-function addListItemToList(listItem, items) {
-	items.push(listItem);
-	return items[items.length - 1];
-}
-
-function addListItemToView(listItem, arPos) {
-	let myListsEl = document.getElementById('selectedListEl');
-	let listItemEl = itemToItemEl(listItem, arPos);
-	addClass(listItemEl, 'fade-in');
-	myListsEl.appendChild(listItemEl);
-	window.setTimeout(function(){removeClass(listItemEl, 'fade-in')}, 200);
-	return listItemEl;
-}
-
-function selectList(listName, selectedListEl, appData) {
-	appData.selectedItemEl = null;
-	appData.selectedItem = null;
-
-	let prevSelectedListEl = appData.selectedListEl;
-
-	appData.selectedList = appData.lists[listName];
-	appData.selectedListEl = selectedListEl;
-
-	updateSelectedMyListEl(prevSelectedListEl, selectedListEl);
-	updateSelectedListView(appData.selectedList);
-}
-
-function updateSelectedMyListEl(prevEl, selectedListEl) {
-	if(prevEl != null) {
-		removeClass(prevEl, 'active-list-item-selected');
-	}
-	addClass(selectedListEl, 'active-list-item-selected');
-}
-
-function selectItem(itemPos, itemEl, appData) {
-
-	let prevItemEl = appData.selectedItemEl;
-
-	appData.selectedItem = appData.selectedList.items[itemPos];
-	appData.selectedItemEl = itemEl;
-
-	updateSelectedItemView(prevItemEl, itemEl);
-}
-
-function updateSelectedItemView(prevItemEl, itemEl) {
-	if(prevItemEl != null) {
-		removeClass(prevItemEl, 'active-list-item-selected');
-	}
-	addClass(itemEl, 'active-list-item-selected');
-}
-
-function toggleCheckItem(itemPos, itemEl, items) {
-	var checkState = items[itemPos].isComplete;
-	if(checkState) {
-		items[itemPos].isComplete = false;
-		addClass(itemEl, 'checked-fadein');
-		removeClass(itemEl, 'item-completed');
-		removeClass(itemEl.firstElementChild, 'item-checkbox-checked');
-
-	} else {
-		items[itemPos].isComplete = true;
-		removeClass(itemEl, 'checked-fadein');
-		addClass(itemEl, 'item-completed');
-		addClass(itemEl.firstElementChild, 'item-checkbox-checked');
-	}
+/*
+Purpose: to handle the model, view and storage logic for creating a new item
+*/
+function handleCreateNewItem(itemName, todoAppData, todoService, todoViewSetter) {
 	
+	//add new item to the model
+	let newItem = todoAppData.selectedList.addItem(itemName);
+	//persist new item to storage
+	todoService.saveListsToLocalStore(todoAppData.lists);
+	//add new item to view
+	todoViewSetter.addNewItem(newItem, todoAppData.selectedList.items.length - 1);
 }
 
-function deleteItem(itemPos, itemEl, items) {
-	items[itemPos].isDeleted = true;
-	addClass(itemEl, 'fadeout-el');
-	window.setTimeout(function(){itemEl.remove();},500);
+/*
+Purpose: to handle model and view logic for selecting a new list
+*/
+function handleSelectList(listName, listMenuItemEl, todoAppData, todoViewSetter) {
+	todoAppData.setSelectedList(listName);
+	todoViewSetter.setActiveListMenuItem(listMenuItemEl);
+	todoViewSetter.setSelectedList(todoAppData.selectedList);
+}
+
+/*
+Purpose: to handle model and view logic for selecting a new list item
+*/
+function handleSelectItem(itemPos, listItemEl, todoAppData, todoViewSetter) {
+	todoAppData.setSelectedItem(itemPos);
+	todoViewSetter.setActiveSelectedItem(listItemEl);
+}
+
+/*
+Purpose: to handle the model, view, and storage logic for toggling the checkbox
+for a specific list item
+*/
+function handleToggleCheckItem(itemPos, itemEl, todoAppData, todoViewSetter, todoService) {
+	let toggledItem = todoAppData.toggleItemComplete(itemPos);
+	todoService.saveListsToLocalStore(todoAppData.lists);
+	todoViewSetter.setToggleItemComplete(itemEl, toggledItem.isComplete);
+}
+
+/*
+Purpose: to handle the model, view and storage logic for deleting a list item
+this executes a logical delete
+*/
+function handleDeleteItem(itemPos, itemEl, todoAppData, todoViewSetter, todoService) {
+	let deleteItem = todoAppData.deleteItem(itemPos);
+	todoService.saveListsToLocalStore(todoAppData.lists);
+	todoViewSetter.deleteItem(itemEl);
+}
+
+/*
+Purpose: to handle the model, view and storage logic for deleting a list
+this executes a permanent delete
+*/
+function handleDeleteList(todoAppData, todoViewSetter, todoService) {
+	delete todoAppData.lists[todoAppData.selectedList.name];
+	todoAppData.selectedList = todoAppData.lists[Object.keys(todoAppData.lists)[0]];
+	todoService.saveListsToLocalStore(todoAppData.lists);
+	todoViewSetter.deleteSelectedListMenuItem();
+	todoViewSetter.setSelectedList(todoAppData.selectedList);
 }
